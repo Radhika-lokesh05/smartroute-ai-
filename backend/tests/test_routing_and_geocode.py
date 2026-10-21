@@ -13,9 +13,17 @@ from app.models.user import User, UserRole
 from app.services.ors_client import ors_client
 
 
+from unittest.mock import AsyncMock
+
+
 @pytest.fixture(autouse=True)
-def reset_cache_and_rate_limits():
+def reset_cache_and_rate_limits(monkeypatch):
     """Clear in-memory cache and rate limiter counters before and after every test."""
+    monkeypatch.setattr(settings, "ORS_API_KEY", "test_mock_ors_api_key_for_ci_suite")
+    monkeypatch.setattr(
+        "app.services.routing_service.weather_service.get_weather",
+        AsyncMock(return_value=None),
+    )
     cache.clear()
     rate_limiter.clear()
     yield
@@ -282,7 +290,8 @@ async def test_provider_401_handled_without_secret_leak(
         assert response.status_code == 503
         detail = response.json()["detail"]
         assert "secret" not in detail.lower()
-        assert settings.ORS_API_KEY not in detail
+        if settings.ORS_API_KEY:
+            assert settings.ORS_API_KEY not in detail
     finally:
         ors_client._transport = None
         await ors_client.close()

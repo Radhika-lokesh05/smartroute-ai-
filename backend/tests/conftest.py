@@ -22,6 +22,13 @@ if sys.platform == "win32":
 _DB_INITIALIZED = False
 
 
+@pytest.fixture(autouse=True)
+def configure_test_ors_api_key(monkeypatch):
+    """Ensure settings.ORS_API_KEY is non-empty for test runs unless explicitly tested."""
+    if not settings.ORS_API_KEY:
+        monkeypatch.setattr(settings, "ORS_API_KEY", "test_mock_ors_api_key_for_ci_suite")
+
+
 def get_test_db_url() -> str:
     """Retrieve and strictly validate TEST_DATABASE_URL."""
     test_url = os.getenv("TEST_DATABASE_URL", settings.TEST_DATABASE_URL)

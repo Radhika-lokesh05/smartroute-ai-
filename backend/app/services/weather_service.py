@@ -2,6 +2,7 @@
 Weather integration service using Open-Meteo public forecast API.
 Normalizes meteorological data to match Bengaluru traffic dataset categories.
 """
+import asyncio
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
@@ -47,8 +48,41 @@ class WeatherService:
         self._wind_threshold: float = 35.0
         self._default_condition: str = "Clear"
         self._load_mapping()
-        self.client = httpx.AsyncClient(timeout=4.0)
+        self._client: Optional[httpx.AsyncClient] = None
+        self._client_loop: Optional[Any] = None
         self._map_wmo_to_condition = self.map_weather_condition
+
+    @property
+    def client(self) -> httpx.AsyncClient:
+        """Return or lazily create an AsyncClient bound to the current running event loop."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if (
+            self._client is None
+            or self._client.is_closed
+            or (self._client_loop is not None and (self._client_loop.is_closed() or (loop and self._client_loop is not loop)))
+        ):
+            self._client = httpx.AsyncClient(timeout=4.0)
+            self._client_loop = loop
+        return self._client
+
+    @client.setter
+    def client(self, value: httpx.AsyncClient) -> None:
+        self._client = value
+        try:
+            self._client_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            self._client_loop = None
+
+    async def close(self) -> None:
+        """Close the underlying HTTP client session."""
+        if self._client and not self._client.is_closed:
+            await self._client.aclose()
+        self._client = None
+        self._client_loop = None
 
     def _load_mapping(self) -> None:
         """Load weather condition categorization mapping from YAML."""
@@ -167,6 +201,8 @@ class WeatherService:
                 logger.warning("Open-Meteo returned status %d on attempt %d", resp.status_code, attempt + 1)
             except Exception as exc:
                 logger.warning("Open-Meteo connection attempt %d failed: %s", attempt + 1, exc)
+                self._client = None
+                self._client_loop = None
         return None
 
     def _parse_meteo_response(
