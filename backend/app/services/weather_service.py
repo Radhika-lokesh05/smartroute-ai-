@@ -118,9 +118,12 @@ class WeatherService:
         self,
         lat: float,
         lng: float,
+        at_time: Optional[datetime] = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> Optional[WeatherResponse]:
-        """Backwards-compatibility alias for get_weather."""
-        return await self.get_weather(lat, lng)
+        """Backwards-compatibility alias for get_weather supporting optional departure times and keyword args."""
+        return await self.get_weather(lat, lng, at_time=at_time)
 
     async def _fetch_open_meteo(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Call Open-Meteo API with timeout and 1 retry."""
@@ -190,3 +193,5 @@ class WeatherService:
 
 
 weather_service = WeatherService()
+get_current_weather = weather_service.get_current_weather
+get_weather = weather_service.get_weather

@@ -98,6 +98,31 @@ async def test_weather_service_http_error_fallback_to_none():
         assert res is None
 
 
+@pytest.mark.asyncio
+async def test_weather_service_get_current_weather_alias():
+    """Verify get_current_weather forwards accurately with or without at_time."""
+    from app.services.weather_service import get_current_weather
+    svc = WeatherService()
+    mock_resp = MagicMock()
+    mock_resp.status_code = 200
+    mock_resp.json.return_value = {
+        "current": {
+            "weather_code": 0,
+            "precipitation": 0.0,
+            "visibility": 10000.0,
+            "temperature_2m": 25.0,
+            "wind_speed_10m": 5.0,
+        }
+    }
+    with patch.object(svc.client, "get", AsyncMock(return_value=mock_resp)):
+        res1 = await svc.get_current_weather(12.9716, 77.5946)
+        assert res1 is not None
+        assert res1.condition == "Clear"
+
+        res2 = await svc.get_current_weather(12.9716, 77.5946, at_time=datetime.now(timezone.utc))
+        assert res2 is not None
+
+
 # -------------------------------------------------------------------------
 # 2. Weather Mapping & Wind Threshold
 # -------------------------------------------------------------------------
