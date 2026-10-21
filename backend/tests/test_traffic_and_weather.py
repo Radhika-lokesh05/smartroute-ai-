@@ -122,6 +122,9 @@ async def test_weather_service_get_current_weather_alias():
         res2 = await svc.get_current_weather(12.9716, 77.5946, at_time=datetime.now(timezone.utc))
         assert res2 is not None
 
+        res3 = await svc.get_current_weather((12.9716, 77.5946))
+        assert res3 is not None
+
 
 # -------------------------------------------------------------------------
 # 2. Weather Mapping & Wind Threshold

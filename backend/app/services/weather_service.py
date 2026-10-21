@@ -65,34 +65,68 @@ class WeatherService:
             except Exception as exc:
                 logger.warning("Could not parse %s: %s. Using default mapping.", self.mapping_path, exc)
 
-    def map_weather_condition(self, weather_code: int, wind_speed_kmh: float = 0.0) -> str:
+    def map_weather_condition(
+        self,
+        weather_code: int,
+        wind_speed_kmh: float = 0.0,
+        *args: Any,
+        **kwargs: Any,
+    ) -> str:
         """Map WMO code and wind speed to dataset weather condition category."""
-        base_condition = self._wmo_mapping.get(weather_code, self._default_condition)
-        if wind_speed_kmh >= self._wind_threshold and base_condition in ("Clear", "Overcast"):
+        wind = wind_speed_kmh
+        if "wind_speed" in kwargs:
+            wind = float(kwargs["wind_speed"])
+        elif args:
+            wind = float(args[0])
+        base_condition = self._wmo_mapping.get(int(weather_code), self._default_condition)
+        if wind >= self._wind_threshold and base_condition in ("Clear", "Overcast"):
             return "Windy"
         return base_condition
 
     async def get_weather(
         self,
-        lat: float,
-        lng: float,
+        lat: Any,
+        lng: Optional[float] = None,
         at_time: Optional[datetime] = None,
+        when: Optional[datetime] = None,
+        *args: Any,
+        **kwargs: Any,
     ) -> Optional[WeatherResponse]:
         """
         Fetch normalized weather conditions for coordinates and optional future departure time.
         Uses in-memory TTL cache with coordinates rounded to 2 decimals (~1.1 km).
         Returns None safely if Open-Meteo is unreachable without failing the caller.
         """
-        time_key = at_time.strftime("%Y-%m-%d-%H") if at_time else None
-        cache_key = make_weather_cache_key(lat, lng, time_key)
+        # Support tuple/list input e.g. get_weather((12.97, 77.59), departure_time)
+        if isinstance(lat, (tuple, list)) and len(lat) >= 2:
+            query_lat = float(lat[0])
+            query_lng = float(lat[1])
+            target_time = lng if isinstance(lng, datetime) else (at_time or when or kwargs.get("time"))
+        elif isinstance(lat, dict) and "lat" in lat and "lng" in lat:
+            query_lat = float(lat["lat"])
+            query_lng = float(lat["lng"])
+            target_time = at_time or when or kwargs.get("time")
+        else:
+            query_lat = float(lat)
+            query_lng = float(lng) if lng is not None else float(kwargs.get("longitude", kwargs.get("lng", 0.0)))
+            target_time = at_time or when or kwargs.get("time")
+
+        if args and target_time is None:
+            for arg in args:
+                if isinstance(arg, datetime):
+                    target_time = arg
+                    break
+
+        time_key = target_time.strftime("%Y-%m-%d-%H") if target_time else None
+        cache_key = make_weather_cache_key(query_lat, query_lng, time_key)
 
         cached: Optional[WeatherResponse] = cache.get(cache_key)
         if cached is not None:
             return cached
 
         # Round to 2 decimals for query
-        q_lat = round(lat, 2)
-        q_lng = round(lng, 2)
+        q_lat = round(query_lat, 2)
+        q_lng = round(query_lng, 2)
 
         params: Dict[str, Any] = {
             "latitude": q_lat,
@@ -107,7 +141,7 @@ class WeatherService:
             return None
 
         try:
-            weather_resp = self._parse_meteo_response(raw_data, at_time)
+            weather_resp = self._parse_meteo_response(raw_data, target_time)
             cache.set(cache_key, weather_resp, ttl_seconds=settings.WEATHER_CACHE_TTL_S)
             return weather_resp
         except Exception as exc:
@@ -116,14 +150,11 @@ class WeatherService:
 
     async def get_current_weather(
         self,
-        lat: float,
-        lng: float,
-        at_time: Optional[datetime] = None,
         *args: Any,
         **kwargs: Any,
     ) -> Optional[WeatherResponse]:
-        """Backwards-compatibility alias for get_weather supporting optional departure times and keyword args."""
-        return await self.get_weather(lat, lng, at_time=at_time)
+        """Backwards-compatibility alias for get_weather supporting all positional & keyword arguments."""
+        return await self.get_weather(*args, **kwargs)
 
     async def _fetch_open_meteo(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Call Open-Meteo API with timeout and 1 retry."""
