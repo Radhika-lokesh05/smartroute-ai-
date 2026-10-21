@@ -37,10 +37,13 @@ def clean_neon_asyncpg_url(url: Optional[str]) -> Optional[str]:
         parsed = urlparse(clean_url)
         qs = parse_qs(parsed.query)
         # Remove asyncpg-incompatible parameters that Neon UI includes
-        qs.pop("sslmode", None)
-        qs.pop("channel_binding", None)
-        # Enforce ssl=require for Neon serverless postgres
-        qs["ssl"] = ["require"]
+        # Enforce ssl=require for Neon and remote cloud postgres, but allow non-SSL for localhost/CI Docker
+        hostname = (parsed.hostname or "").lower()
+        if any(h in hostname for h in ("neon.tech", "render.com", "aws")):
+            qs["ssl"] = ["require"]
+        elif hostname in ("localhost", "127.0.0.1", "postgres"):
+            qs.pop("ssl", None)
+
         new_query = urlencode(qs, doseq=True)
         return urlunparse(parsed._replace(query=new_query))
     except Exception:
