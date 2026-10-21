@@ -201,8 +201,6 @@ class WeatherService:
                 logger.warning("Open-Meteo returned status %d on attempt %d", resp.status_code, attempt + 1)
             except Exception as exc:
                 logger.warning("Open-Meteo connection attempt %d failed: %s", attempt + 1, exc)
-                self._client = None
-                self._client_loop = None
         return None
 
     def _parse_meteo_response(
