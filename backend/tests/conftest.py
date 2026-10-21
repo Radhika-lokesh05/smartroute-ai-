@@ -9,11 +9,11 @@ from typing import AsyncGenerator
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import text, pool
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from app.main import app
+from app.main import app as fastapi_app
 from app.core.config import settings
 from app.core.database import get_db
 from app.models.base import Base
-import app.models  # Register all ORM models (AuditLog, Hospital, Ambulance, etc.) in Base.metadata
+from app import models as _registered_models  # Register all ORM models in Base.metadata
 
 # Ensure Windows uses SelectorEventLoop to prevent SSL transport cleanup error on loop shutdown
 if sys.platform == "win32":
@@ -145,7 +145,7 @@ async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
 @pytest_asyncio.fixture
 async def client() -> AsyncGenerator[AsyncClient, None]:
     """Standard HTTP test client for routes not requiring database overrides."""
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as async_client:
         yield async_client
 
@@ -163,8 +163,8 @@ async def auth_client(test_engine, db_session: AsyncSession) -> AsyncGenerator[A
         async with session_factory() as session:
             yield session
 
-    app.dependency_overrides[get_db] = _override_get_db
-    transport = ASGITransport(app=app)
+    fastapi_app.dependency_overrides[get_db] = _override_get_db
+    transport = ASGITransport(app=fastapi_app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as async_client:
         yield async_client
-    app.dependency_overrides.clear()
+    fastapi_app.dependency_overrides.clear()
