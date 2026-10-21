@@ -61,8 +61,11 @@ jobs:
                   if not exists:
                       await conn.execute('CREATE DATABASE smartroute_pytest')
                   await conn.close()
+                  conn_p = await asyncpg.connect('postgresql://test_user:test_password@localhost:5432/smartroute_pytest')
+                  await conn_p.execute('CREATE EXTENSION IF NOT EXISTS postgis;')
+                  await conn_p.close()
               except Exception as e:
-                  print('Notice creating pytest database:', e)
+                  print('Notice initializing test database:', e)
           asyncio.run(create_pytest_db())
           "
           alembic upgrade head
@@ -76,7 +79,7 @@ jobs:
           ENV: development
         run: |
           cd backend
-          pytest --cov=app/services --cov=app/api --cov-report=term-missing --cov-report=xml tests/
+          pytest -v --cov=app/services --cov=app/api --cov-report=term-missing --cov-report=xml tests/
 
   ml:
     name: Machine Learning Model Tests

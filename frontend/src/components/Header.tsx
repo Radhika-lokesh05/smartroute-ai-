@@ -29,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   const renderStatusBadge = () => {
     const configs: Record<RealtimeConnectionStatus, { bg: string; dot: string; text: string; label: string }> = {
       live: { bg: 'bg-emerald-950/80 border-emerald-800/80', dot: 'bg-emerald-400 animate-pulse', text: 'text-emerald-400', label: 'Live' },
+      connected: { bg: 'bg-emerald-950/80 border-emerald-800/80', dot: 'bg-emerald-400 animate-pulse', text: 'text-emerald-400', label: 'Live' },
       reconnecting: { bg: 'bg-amber-950/80 border-amber-800/80', dot: 'bg-amber-400 animate-spin', text: 'text-amber-400', label: 'Reconnecting' },
       connecting: { bg: 'bg-cyan-950/80 border-cyan-800/80', dot: 'bg-cyan-400 animate-pulse', text: 'text-cyan-400', label: 'Connecting' },
       offline: { bg: 'bg-slate-800 border-slate-700', dot: 'bg-slate-500', text: 'text-slate-400', label: 'Offline' },

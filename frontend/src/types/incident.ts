@@ -12,6 +12,7 @@ export type VoteType = 'confirm' | 'reject';
 export interface Incident {
   id: string;
   incident_type: IncidentType;
+  type?: IncidentType;
   status: IncidentStatus;
   lat: number;
   lng: number;

@@ -57,7 +57,7 @@ export const AdminLiveMapPage: React.FC = () => {
             <Marker key={inc.id} position={[inc.lat, inc.lng]} icon={incIcon} eventHandlers={{ click: () => setSelectedInc(inc) }}>
               <Popup>
                 <div className="text-xs p-1">
-                  <p className="font-bold text-red-600 uppercase">{inc.type}</p>
+                  <p className="font-bold text-red-600 uppercase">{inc.incident_type || inc.type}</p>
                   <p className="text-slate-700">Status: {inc.status}</p>
                   <p className="text-slate-500">Score: {inc.trust_score.toFixed(1)}</p>
                 </div>
@@ -96,7 +96,7 @@ export const AdminLiveMapPage: React.FC = () => {
                 }`}
               >
                 <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-slate-200 capitalize">{inc.type}</span>
+                  <span className="font-bold text-slate-200 capitalize">{inc.incident_type || inc.type}</span>
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 font-mono">{inc.status}</span>
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1 truncate">{inc.note || 'No description provided'}</p>
