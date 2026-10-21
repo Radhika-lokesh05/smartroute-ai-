@@ -19,7 +19,7 @@ describe('Admin Dashboard Test Suite', () => {
   // 1. Admin route guard
   it('blocks civilian user from accessing admin route and redirects', () => {
     vi.spyOn(useAuthModule, 'useAuth').mockReturnValue({
-      user: { id: 'civ-1', name: 'Civilian User', email: 'civ@test.com', role: 'civilian', is_active: true },
+      user: { id: 'civ-1', name: 'Civilian User', email: 'civ@test.com', role: 'civilian', is_active: true, created_at: '2026-01-01T00:00:00Z' },
       token: 'fake-token',
       isLoading: false,
       login: vi.fn(),
@@ -49,7 +49,7 @@ describe('Admin Dashboard Test Suite', () => {
 
   it('allows administrator to access admin route', () => {
     vi.spyOn(useAuthModule, 'useAuth').mockReturnValue({
-      user: { id: 'adm-1', name: 'Admin Master', email: 'admin@test.com', role: 'admin', is_active: true },
+      user: { id: 'adm-1', name: 'Admin Master', email: 'admin@test.com', role: 'admin', is_active: true, created_at: '2026-01-01T00:00:00Z' },
       token: 'fake-token',
       isLoading: false,
       login: vi.fn(),
@@ -122,7 +122,7 @@ describe('Admin Dashboard Test Suite', () => {
   // 3. Simulated badge
   it('renders the simulated badge when isSimulatedActive is true', () => {
     vi.spyOn(useAuthModule, 'useAuth').mockReturnValue({
-      user: { id: 'adm-1', name: 'Admin Master', email: 'admin@test.com', role: 'admin', is_active: true },
+      user: { id: 'adm-1', name: 'Admin Master', email: 'admin@test.com', role: 'admin', is_active: true, created_at: '2026-01-01T00:00:00Z' },
       token: 'fake-token',
       isLoading: false,
       login: vi.fn(),

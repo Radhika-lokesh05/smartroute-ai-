@@ -13,6 +13,7 @@ from app.main import app
 from app.core.config import settings
 from app.core.database import get_db
 from app.models.base import Base
+import app.models  # Register all ORM models (AuditLog, Hospital, Ambulance, etc.) in Base.metadata
 
 # Ensure Windows uses SelectorEventLoop to prevent SSL transport cleanup error on loop shutdown
 if sys.platform == "win32":

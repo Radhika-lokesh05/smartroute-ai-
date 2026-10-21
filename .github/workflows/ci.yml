@@ -52,7 +52,21 @@ jobs:
           DATABASE_URL: postgresql+asyncpg://test_user:test_password@localhost:5432/smartroute_test
         run: |
           cd backend
+          python -c "
+          import asyncio, asyncpg
+          async def create_pytest_db():
+              try:
+                  conn = await asyncpg.connect('postgresql://test_user:test_password@localhost:5432/smartroute_test')
+                  exists = await conn.fetchval(\"SELECT 1 FROM pg_database WHERE datname = 'smartroute_pytest'\")
+                  if not exists:
+                      await conn.execute('CREATE DATABASE smartroute_pytest')
+                  await conn.close()
+              except Exception as e:
+                  print('Notice creating pytest database:', e)
+          asyncio.run(create_pytest_db())
+          "
           alembic upgrade head
+          DATABASE_URL=postgresql+asyncpg://test_user:test_password@localhost:5432/smartroute_pytest alembic upgrade head || true
 
       - name: Run Pytest with Coverage Report
         env:

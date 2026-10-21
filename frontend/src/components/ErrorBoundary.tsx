@@ -24,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
     // Redact any potential query strings or secrets before logging
     const safeMsg = error.message.replace(/([?&])(token|key|secret)=[^&]+/gi, '$1$2=[REDACTED]');
     // Clean console notification without leaking sensitive tokens
-    if (process.env.NODE_ENV !== 'production') {
+    if (import.meta.env.DEV) {
       console.error('[ErrorBoundary]', safeMsg, errorInfo);
     }
   }

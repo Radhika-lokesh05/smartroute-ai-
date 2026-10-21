@@ -167,6 +167,10 @@ export class RealtimeClient {
     }
   }
 
+  public subscribeArea(lat: number, lng: number, radiusM = 5000): void {
+    this.subscribe(lat, lng, radiusM);
+  }
+
   private sendSubscribe(): void {
     if (this.subLat === null || this.subLng === null) return;
     this.sendJson({

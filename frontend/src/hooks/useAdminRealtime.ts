@@ -26,7 +26,7 @@ export function useAdminRealtime() {
     const client = new RealtimeClient({
       apiBaseUrl: API_BASE_URL,
       token,
-      onStatusChange: (status) => setConnected(status === 'connected'),
+      onStatusChange: (status) => setConnected(status === 'connected' || status === 'live'),
       onIncidentEvent: (msg) => {
         const inc = msg.data as IncidentPublic;
         if (!inc || !inc.id) return;

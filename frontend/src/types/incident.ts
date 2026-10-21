@@ -29,6 +29,8 @@ export interface Incident {
   distance_m?: number | null;
 }
 
+export type IncidentPublic = Incident;
+
 export interface IncidentListResponse {
   total: number;
   incidents: Incident[];
@@ -156,4 +158,4 @@ export type WsServerMessage =
   | WsDispatchCancelledMessage
   | WsHospitalPrealertMessage;
 
-export type RealtimeConnectionStatus = 'connecting' | 'live' | 'reconnecting' | 'offline';
+export type RealtimeConnectionStatus = 'connecting' | 'live' | 'connected' | 'reconnecting' | 'offline';
