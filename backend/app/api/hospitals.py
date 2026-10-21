@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_optional_current_user
+from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.hospital import HospitalNearbyResponse
@@ -21,12 +21,12 @@ async def get_nearby_hospitals(
         description="Optional emergency specialization: general | trauma | cardiac | burns | maternity | pediatric",
     ),
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[User] = Depends(get_optional_current_user),
+    current_user: User = Depends(get_current_user),
 ) -> HospitalNearbyResponse:
     """
     Search and rank nearest emergency hospitals to specified coordinates.
     Incorporates traffic and incident delays for top candidates.
-    Supports both guest emergency access and authenticated users.
+    Requires authenticated user.
     """
     return await hospital_service.rank_hospitals(
         origin=(lat, lng),

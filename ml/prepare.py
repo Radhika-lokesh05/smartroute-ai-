@@ -60,12 +60,17 @@ def prepare_dataset(
 
     # Locate dataset
     if data_path is None:
-        csv_files = sorted(DATA_DIR.glob("*.csv"))
+        csv_files = sorted(DATA_DIR.glob("*.csv")) if DATA_DIR.exists() else []
         if not csv_files:
-            excel_files = sorted(DATA_DIR.glob("*.xlsx"))
-            if not excel_files:
-                raise FileNotFoundError(f"No traffic dataset file found in {DATA_DIR}")
-            data_path = excel_files[0]
+            excel_files = sorted(DATA_DIR.glob("*.xlsx")) if DATA_DIR.exists() else []
+            if excel_files:
+                data_path = excel_files[0]
+            elif (ARTIFACTS_DIR / "cleaned_data.csv").exists():
+                logger.info("Raw data not found in %s; using processed %s for CI/testing", DATA_DIR, ARTIFACTS_DIR / "cleaned_data.csv")
+                df_clean = pd.read_csv(ARTIFACTS_DIR / "cleaned_data.csv")
+                return df_clean, {"final_rows": len(df_clean), "cleaned": True}
+            else:
+                raise FileNotFoundError(f"No traffic dataset file found in {DATA_DIR} or {ARTIFACTS_DIR}")
         else:
             data_path = csv_files[0]
 
