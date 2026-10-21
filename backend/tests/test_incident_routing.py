@@ -43,6 +43,11 @@ def reset_cache(monkeypatch):
     )
     monkeypatch.setattr(
         weather_service,
+        "get_weather",
+        AsyncMock(return_value=None),
+    )
+    monkeypatch.setattr(
+        weather_service,
         "get_current_weather",
         AsyncMock(return_value=None),
     )

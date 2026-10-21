@@ -176,7 +176,7 @@ async def test_nearby_hospitals_ranking_and_fields(
 
     # Mock routing_service.get_routes so tests do not rely on live ORS network quota
     from app.schemas.routing import GeoJSONLineString, RouteItem, RouteResponse
-    async def mock_get_routes(origin, destination, avoid_polygons=None, use_incidents=True, db=None):
+    async def mock_get_routes(origin, destination, *args, **kwargs):
         return RouteResponse(
             routes=[
                 RouteItem(
@@ -224,7 +224,7 @@ async def test_nearby_hospitals_emergency_type_filtering(
     await create_hospital(db_session, "Super Burns Center", 12.9730, 77.5960, ["general", "burns"])
 
     from app.schemas.routing import GeoJSONLineString, RouteItem, RouteResponse
-    async def mock_get_routes(origin, destination, avoid_polygons=None, use_incidents=True, db=None):
+    async def mock_get_routes(origin, destination, *args, **kwargs):
         return RouteResponse(
             routes=[
                 RouteItem(
@@ -270,7 +270,7 @@ async def test_nearby_hospitals_routing_fallback_to_straight_line(
     await create_hospital(db_session, "Fallback Hospital", 12.9720, 77.5950, ["general"])
 
     # Simulate routing failure
-    async def mock_fail_routes(origin, destination, avoid_polygons=None):
+    async def mock_fail_routes(origin, destination, *args, **kwargs):
         raise RuntimeError("ORS Quota Exceeded")
     monkeypatch.setattr("app.services.hospital_service.routing_service.get_routes", mock_fail_routes)
 
@@ -518,7 +518,7 @@ async def test_dispatch_lifecycle(
 
     # Mock routing for dispatch candidate
     from app.schemas.routing import GeoJSONLineString, RouteItem, RouteResponse
-    async def mock_get_routes(origin, destination, avoid_polygons=None, use_incidents=True, db=None):
+    async def mock_get_routes(origin, destination, *args, **kwargs):
         return RouteResponse(
             routes=[
                 RouteItem(
@@ -622,7 +622,7 @@ async def test_dispatch_decline_reoffers(
     inc = await create_incident(db_session, lat=12.9750, lng=77.5950)
 
     from app.schemas.routing import GeoJSONLineString, RouteItem, RouteResponse
-    async def mock_get_routes(origin, destination, avoid_polygons=None, use_incidents=True, db=None):
+    async def mock_get_routes(origin, destination, *args, **kwargs):
         return RouteResponse(
             routes=[
                 RouteItem(

@@ -114,6 +114,14 @@ class WeatherService:
             logger.warning("Failed to parse Open-Meteo response: %s", exc)
             return None
 
+    async def get_current_weather(
+        self,
+        lat: float,
+        lng: float,
+    ) -> Optional[WeatherResponse]:
+        """Backwards-compatibility alias for get_weather."""
+        return await self.get_weather(lat, lng)
+
     async def _fetch_open_meteo(self, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Call Open-Meteo API with timeout and 1 retry."""
         url = settings.OPEN_METEO_BASE_URL

@@ -79,7 +79,7 @@ jobs:
           ENV: development
         run: |
           cd backend
-          pytest -v --cov=app/services --cov=app/api --cov-report=term-missing --cov-report=xml tests/
+          pytest -v --tb=short --cov=app/services --cov=app/api --cov-report=term-missing --cov-report=xml tests/
 
   ml:
     name: Machine Learning Model Tests
