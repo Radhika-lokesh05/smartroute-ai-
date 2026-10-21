@@ -6,7 +6,6 @@ import {
   Navigation, 
   Siren, 
   Building2, 
-  CloudRain, 
   Cpu, 
   GitBranch 
 } from 'lucide-react';

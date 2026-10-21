@@ -1,0 +1,36 @@
+# Open-Meteo WMO Weather Code to Bengaluru Traffic Dataset Weather Categories
+# Dataset Weather Categories: ['Clear', 'Overcast', 'Fog', 'Rain', 'Windy']
+# Note: Categories not in the dataset (like Snow/Sleet) are mapped to the closest logical category ('Rain').
+
+wmo_code_mapping:
+  0: "Clear"       # Clear sky
+  1: "Clear"       # Mainly clear
+  2: "Overcast"    # Partly cloudy
+  3: "Overcast"    # Overcast
+  45: "Fog"        # Fog
+  48: "Fog"        # Depositing rime fog
+  51: "Rain"       # Light drizzle
+  53: "Rain"       # Moderate drizzle
+  55: "Rain"       # Dense drizzle
+  56: "Rain"       # Light freezing drizzle
+  57: "Rain"       # Dense freezing drizzle
+  61: "Rain"       # Slight rain
+  63: "Rain"       # Moderate rain
+  65: "Rain"       # Heavy rain
+  66: "Rain"       # Light freezing rain
+  67: "Rain"       # Heavy freezing rain
+  71: "Rain"       # Slight snow fall (mapped to Rain)
+  73: "Rain"       # Moderate snow fall (mapped to Rain)
+  75: "Rain"       # Heavy snow fall (mapped to Rain)
+  77: "Rain"       # Snow grains (mapped to Rain)
+  80: "Rain"       # Slight rain showers
+  81: "Rain"       # Moderate rain showers
+  82: "Rain"       # Violent rain showers
+  85: "Rain"       # Slight snow showers (mapped to Rain)
+  86: "Rain"       # Heavy snow showers (mapped to Rain)
+  95: "Rain"       # Thunderstorm: Slight or moderate
+  96: "Rain"       # Thunderstorm with slight hail
+  99: "Rain"       # Thunderstorm with heavy hail
+
+wind_speed_threshold_kmh: 35.0  # Wind speeds >= 35 km/h override Clear/Overcast with 'Windy'
+default_condition: "Clear"

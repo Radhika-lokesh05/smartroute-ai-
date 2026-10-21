@@ -1,0 +1,20 @@
+# Column mapping configuration for Bengaluru traffic model
+target_column: "Travel Time Index"
+area_column: "Area Name"
+date_column: "Date"
+weather_column: "Weather Conditions"
+
+# Strictly excluded columns to avoid target leakage at prediction time
+excluded_columns:
+  - "Traffic Volume"
+  - "Average Speed"
+  - "Congestion Level"
+  - "Road Capacity Utilization"
+  - "Incident Reports"
+  - "Environmental Impact"
+  - "Public Transport Usage"
+  - "Traffic Signal Compliance"
+  - "Parking Usage"
+  - "Pedestrian and Cyclist Count"
+  - "Roadwork and Construction Activity"
+  - "Road/Intersection Name"

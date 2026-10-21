@@ -1,0 +1,19 @@
+# Pre-commit configuration for SmartRoute AI
+# Optional local hook installation: pip install pre-commit && pre-commit install
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: ^(\.github/|render\.yaml)
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=5120'] # Block files over 5 MB
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks

@@ -30,9 +30,21 @@ frontend/dist-ssr/
 # Environment & Secrets (NEVER COMMIT)
 .env
 *.env
+.env.*
+.env.local
+backend/.env
+frontend/.env
+backend/*.env
+frontend/*.env
+backend/.env.*
+frontend/.env.*
 !.env.example
+!backend/.env.example
+!frontend/.env.example
 *.pem
 *.key
+*.cert
+credentials.json
 
 # IDE & OS
 .vscode/
@@ -45,3 +57,8 @@ Thumbs.db
 # Vite / Temporary
 .vite/
 .eslintcache
+
+# ML Raw Datasets & Audit Reports
+ml/data/
+audit-reports/
+

@@ -1,0 +1,53 @@
+{
+  "data_source": "kaggle-bangalore-city-traffic",
+  "file_name": "Banglore_traffic_Dataset.csv",
+  "model_version": "v1.0.0",
+  "training_date": "2026-10-19T04:01:17.891209+00:00",
+  "granularity": "daily",
+  "train_rows": 7607,
+  "val_rows": 1329,
+  "train_date_range": [
+    "2022-01-01",
+    "2024-03-19"
+  ],
+  "val_date_range": [
+    "2024-03-20",
+    "2024-08-09"
+  ],
+  "areas_covered": [
+    "Electronic City",
+    "Hebbal",
+    "Indiranagar",
+    "Jayanagar",
+    "Koramangala",
+    "M.G. Road",
+    "Whitefield",
+    "Yeshwanthpur"
+  ],
+  "metrics": {
+    "lightgbm": {
+      "mae": 0.1185,
+      "rmse": 0.1493,
+      "r2": 0.1862
+    },
+    "baseline": {
+      "mae": 0.1167,
+      "rmse": 0.1463,
+      "r2": 0.2187
+    },
+    "model_beats_baseline": false,
+    "mae_improvement_pct": -1.54
+  },
+  "feature_importance_top10": {
+    "month": 2680,
+    "weekday": 2176,
+    "weather_Clear": 594,
+    "weather_Overcast": 399,
+    "weather_Rain": 397,
+    "weather_Fog": 350,
+    "is_holiday": 277,
+    "area_Hebbal": 276,
+    "area_Indiranagar": 274,
+    "weather_Windy": 248
+  }
+}

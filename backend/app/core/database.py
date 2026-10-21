@@ -54,3 +54,28 @@ async def check_database_connection(timeout_seconds: float = 2.0) -> Tuple[bool,
     except Exception as exc:
         # Gracefully handle unreachable host, invalid auth, network drop, etc.
         return False, f"Database unreachable: {type(exc).__name__}"
+
+
+async def check_database_readiness(timeout_seconds: float = 2.0) -> Tuple[bool, str, str]:
+    """
+    Safely check database connectivity and migration state without leaking internal connection details.
+    Returns (is_ready: bool, db_status: str, migration_status: str).
+    """
+    try:
+        async def _check() -> Tuple[bool, str, str]:
+            async with engine.connect() as conn:
+                await conn.execute(text("SELECT 1"))
+                try:
+                    res = await conn.execute(text("SELECT version_num FROM alembic_version LIMIT 1"))
+                    row = res.fetchone()
+                    migration = "up_to_date" if row else "pending"
+                except Exception:
+                    migration = "unknown"
+                return True, "connected", migration
+
+        return await asyncio.wait_for(_check(), timeout=timeout_seconds)
+    except asyncio.TimeoutError:
+        return False, "unreachable", "unknown"
+    except Exception:
+        return False, "unreachable", "unknown"
+
